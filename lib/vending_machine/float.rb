@@ -15,21 +15,21 @@ class VendingMachine
       }
     end
 
-    def add_coin(denomination)
+    def add_balance(denomination, amount = 1)
       unless @denomination_balances.has_key?(denomination)
-        raise ArgumentError.new("Invalid coin inserted")
+        raise ArgumentError.new("Invalid demomination inserted")
       end
-      @denomination_balances[denomination] += 1
+      @denomination_balances[denomination] += amount
     end
 
-    def remove_coin(denomination)
+    def remove_balance(denomination, amount = 1)
       unless @denomination_balances.has_key?(denomination)
-        raise ArgumentError.new("Invalid coin requested")
+        raise ArgumentError.new("Invalid denomination requested")
       end
-      unless @denomination_balances[denomination] > 0
-        raise ArgumentError.new("No requested coins available")
+      unless @denomination_balances[denomination] >= amount
+        raise ArgumentError.new("Not enough requested denomination available")
       end
-      @denomination_balances[denomination] -= 1
+      @denomination_balances[denomination] -= amount
     end
 
     def request_change(amount)
@@ -40,7 +40,7 @@ class VendingMachine
       current_amount = 0
       [200,100,50,20,10,5,2,1].each { |denomination|
         while (denomination <= amount) && (current_amount + denomination <= amount) && (@denomination_balances[denomination] > 0)
-          remove_coin(denomination)
+          remove_balance(denomination)
           amounts[denomination] += 1
           current_amount += denomination
         end

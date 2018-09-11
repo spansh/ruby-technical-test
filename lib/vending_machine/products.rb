@@ -1,2 +1,0 @@
-class VendingMachine::Products
-end
