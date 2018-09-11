@@ -1,5 +1,6 @@
 require "test/unit"
 require "vending_machine/float"
+require "vending_machine/exceptions"
 
 class VendingMachineFloatTest < Test::Unit::TestCase
   def test_constructor
@@ -48,56 +49,56 @@ class VendingMachineFloatTest < Test::Unit::TestCase
     float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 1, 5 => 1, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 })
     float.remove_balance(1)
     assert_equal(387,float.total,"Removing 1 pence failed")
-    assert_raise ArgumentError,"No 1 pence coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 1 pence coins left should have raised" do
       float.remove_balance(1)
     end
     float.remove_balance(2)
     assert_equal(385,float.total,"Removing 2 pence failed")
-    assert_raise ArgumentError,"No 2 pence coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 2 pence coins left should have raised" do
       float.remove_balance(2)
     end
     float.remove_balance(5)
     assert_equal(380,float.total,"Removing 5 pence failed")
-    assert_raise ArgumentError,"No 5 pence coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 5 pence coins left should have raised" do
       float.remove_balance(5)
     end
     float.remove_balance(10)
     assert_equal(370,float.total,"Removing 10 pence failed")
-    assert_raise ArgumentError,"No 10 pence coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 10 pence coins left should have raised" do
       float.remove_balance(10)
     end
     float.remove_balance(20)
     assert_equal(350,float.total,"Removing 20 pence failed")
-    assert_raise ArgumentError,"No 20 pence coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 20 pence coins left should have raised" do
       float.remove_balance(20)
     end
     float.remove_balance(50)
     assert_equal(300,float.total,"Removing 50 pence failed")
-    assert_raise ArgumentError,"No 50 pence coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 50 pence coins left should have raised" do
       float.remove_balance(50)
     end
     float.remove_balance(100)
     assert_equal(200,float.total,"Removing 1 pound failed")
-    assert_raise ArgumentError,"No 1 pound coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 1 pound coins left should have raised" do
       float.remove_balance(100)
     end
     float.remove_balance(200)
     assert_equal(0,float.total,"Removing 2 pounds failed")
-    assert_raise ArgumentError,"No 2 pound coins left should have raised" do
+    assert_raise VendingMachine::FloatError,"No 2 pound coins left should have raised" do
       float.remove_balance(200)
     end
     float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 20 })
     assert_equal(41,float.total,"Setting up float to remove multiple coins failed")
     float.remove_balance(2,10)
     assert_equal(21,float.total,"Removing 10 2 pence coins failed")
-    assert_raise ArgumentError,"Should have raised an error when removing more 1 pence than available" do
+    assert_raise VendingMachine::FloatError,"Should have raised an error when removing more 1 pence than available" do
       float.remove_balance(1,2)
     end
   end
 
   def test_request_change
     float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 1, 5 => 1, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 })
-    assert_raise ArgumentError,"Requested more change than available should have raised" do
+    assert_raise VendingMachine::FloatError,"Requested more change than available should have raised" do
       float.request_change(389)
     end
     assert_equal({ 1 => 1 },float.request_change(1),'1 pence change was not calculated correctly')
@@ -106,5 +107,17 @@ class VendingMachineFloatTest < Test::Unit::TestCase
     assert_equal({ 1 => 2 },float.request_change(2),'2 pence change with no 2 pence was not calculated correctly')
     float = VendingMachine::Float.new(balances: { 1 => 100, 2 => 100, 5 => 100, 10 => 100, 20 => 100, 50 => 100, 100 => 100, 200 => 100 })
     assert_equal({ 200 => 6, 50 => 1, 10 => 1, 5 => 1, 2 => 1, 1 => 1 },float.request_change(1268),'2 pence change with no 2 pence was not calculated correctly')
+    float = VendingMachine::Float.new(balances: { 1 => 0, 2 => 10, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 })
+    assert_raise VendingMachine::FloatError,"Requested change which could not be made with current coins should have raised" do
+      float.request_change(9)
+    end
+  end
+
+  def test_consume
+    float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 1, 5 => 1, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 })
+    paid = VendingMachine::Float.new(balances: { 1 => 2, 2 => 2, 5 => 2, 10 => 2, 20 => 2, 50 => 2, 100 => 2, 200 => 2 })
+    float.consume(paid)
+    assert_equal(1164,float.total,"Float was not tripled after merge")
+    assert_equal(0,paid.total,"Paid was not emptied after merge")
   end
 end

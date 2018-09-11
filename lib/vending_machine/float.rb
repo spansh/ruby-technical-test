@@ -1,3 +1,5 @@
+require "vending_machine/exceptions"
+
 class VendingMachine
   class Float
     attr_reader :denomination_balances
@@ -15,6 +17,18 @@ class VendingMachine
       }
     end
 
+    def consume(float)
+      unless (float.is_a?(VendingMachine::Float))
+        raise TypeError.new("Can only merge with another float object")
+      end
+
+      [200,100,50,20,10,5,2,1].each { |denomination|
+        amount = float.denomination_balances[denomination]
+        float.remove_balance(denomination,amount)
+        add_balance(denomination,amount)
+      }
+    end
+
     def add_balance(denomination, amount = 1)
       unless @denomination_balances.has_key?(denomination)
         raise ArgumentError.new("Invalid demomination inserted")
@@ -27,14 +41,14 @@ class VendingMachine
         raise ArgumentError.new("Invalid denomination requested")
       end
       unless @denomination_balances[denomination] >= amount
-        raise ArgumentError.new("Not enough requested denomination available")
+        raise VendingMachine::FloatError.new("Not enough requested denomination available")
       end
       @denomination_balances[denomination] -= amount
     end
 
     def request_change(amount)
       if amount > total
-        raise ArgumentError.new("Not enough float to calculate change")
+        raise VendingMachine::FloatError.new("Not enough float to calculate change")
       end
       amounts = Hash.new(0)
       current_amount = 0
@@ -45,6 +59,9 @@ class VendingMachine
           current_amount += denomination
         end
       }
+      if current_amount != amount
+        raise VendingMachine::FloatError.new("Cannot make up change with available coins")
+      end
       return amounts
     end
 
