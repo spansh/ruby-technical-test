@@ -39,7 +39,7 @@ class VendingMachine
       amounts = Hash.new(0)
       current_amount = 0
       [200,100,50,20,10,5,2,1].each { |denomination|
-        while (denomination <= amount) && (current_amount < amount) && (@denomination_balances[denomination] > 0)
+        while (denomination <= amount) && (current_amount + denomination <= amount) && (@denomination_balances[denomination] > 0)
           remove_coin(denomination)
           amounts[denomination] += 1
           current_amount += denomination

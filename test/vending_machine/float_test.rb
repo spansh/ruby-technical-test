@@ -86,7 +86,7 @@ class VendingMachineFloatTest < Test::Unit::TestCase
     end
   end
 
-  def test_calculate_change
+  def test_request_change
     float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 1, 5 => 1, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 })
     assert_raise ArgumentError,"Requested more change than available should have raised" do
       float.request_change(389)
@@ -95,5 +95,7 @@ class VendingMachineFloatTest < Test::Unit::TestCase
     assert_equal({ 2 => 1, 5 => 1, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 },float.request_change(387),'Every coin except 1 pence change was not calculated correctly')
     float = VendingMachine::Float.new(balances: { 1 => 2 })
     assert_equal({ 1 => 2 },float.request_change(2),'2 pence change with no 2 pence was not calculated correctly')
+    float = VendingMachine::Float.new(balances: { 1 => 100, 2 => 100, 5 => 100, 10 => 100, 20 => 100, 50 => 100, 100 => 100, 200 => 100 })
+    assert_equal({ 200 => 6, 50 => 1, 10 => 1, 5 => 1, 2 => 1, 1 => 1 },float.request_change(1268),'2 pence change with no 2 pence was not calculated correctly')
   end
 end
