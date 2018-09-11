@@ -37,12 +37,14 @@ class VendingMachineFloatTest < Test::Unit::TestCase
     assert_equal(188,float.total,"Adding 1 pound failed")
     float.add_balance(200)
     assert_equal(388,float.total,"Adding 2 pounds failed")
+    float.add_balance(1,10)
+    assert_equal(398,float.total,"Adding 10 1 pence coins failed")
     assert_raise ArgumentError,"Adding invalid coin should have raised" do
       float.add_balance(123)
     end
   end
 
-  def test_add_balance
+  def test_remove_balance
     float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 1, 5 => 1, 10 => 1, 20 => 1, 50 => 1, 100 => 1, 200 => 1 })
     float.remove_balance(1)
     assert_equal(387,float.total,"Removing 1 pence failed")
@@ -84,7 +86,10 @@ class VendingMachineFloatTest < Test::Unit::TestCase
     assert_raise ArgumentError,"No 2 pound coins left should have raised" do
       float.remove_balance(200)
     end
-    float = VendingMachine::Float.new(balances: { 1 => 1 })
+    float = VendingMachine::Float.new(balances: { 1 => 1, 2 => 20 })
+    assert_equal(41,float.total,"Setting up float to remove multiple coins failed")
+    float.remove_balance(2,10)
+    assert_equal(21,float.total,"Removing 10 2 pence coins failed")
     assert_raise ArgumentError,"Should have raised an error when removing more 1 pence than available" do
       float.remove_balance(1,2)
     end
