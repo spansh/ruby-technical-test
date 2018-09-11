@@ -6,12 +6,12 @@ require "vending_machine/version"
 Gem::Specification.new do |spec|
   spec.name          = "vending_machine"
   spec.version       = VendingMachine::VERSION
-  spec.authors       = ["TODO: Write your name"]
-  spec.email         = ["TODO: Write your email address"]
+  spec.authors       = ["Gareth Harper"]
+  spec.email         = ["github@spansh.co.uk"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Vending Machine Technical Test.}
+  spec.description   = %q{Basic vending machine class for Cleo technical test}
+  spec.homepage      = "https://github.com/spansh"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rspec", "~> 3.2"
 end
